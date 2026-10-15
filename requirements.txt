@@ -1,0 +1,5 @@
+pandas>=2.0.0
+pyarrow>=14.0.0
+requests>=2.31.0
+matplotlib>=3.7.0
+pandera>=0.20.0

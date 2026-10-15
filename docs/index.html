@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi Pipeline - Trip Analysis</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+        .fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            text-align: center;
+            padding: 2rem;
+        }
+        .fallback h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .fallback p {
+            font-size: 1rem;
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .fallback a {
+            color: #0366d6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .fallback a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="https://dbc-27ed99b3-9bac.cloud.databricks.com/dashboardsv3/01f1c63e3bf6146da8b0565cf150907b/published?o=7474646500446614"
+            title="NYC Taxi Pipeline - Trip Analysis"
+            onload="document.getElementById('fallback').style.display='none'">
+    </iframe>
+    <div id="fallback" class="fallback">
+        <h1>NYC Taxi Pipeline - Trip Analysis</h1>
+        <p>The embedded Databricks dashboard could not be loaded. This may be due to authentication requirements or network restrictions.</p>
+        <p>You can access the dashboard directly here:<br>
+            <a href="https://dbc-27ed99b3-9bac.cloud.databricks.com/dashboardsv3/01f1c63e3bf6146da8b0565cf150907b/published?o=7474646500446614" target="_blank">
+                Open NYC Taxi Pipeline - Trip Analysis Dashboard
+            </a>
+        </p>
+    </div>
+</body>
+</html>

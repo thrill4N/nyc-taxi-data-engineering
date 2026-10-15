@@ -1,0 +1,561 @@
+{
+  "datasets": [
+    {
+      "name": "top_routes",
+      "displayName": "Top Routes",
+      "queryLines": [
+        "SELECT\n",
+        "  PULocationID,\n",
+        "  DOLocationID,\n",
+        "  trip_count,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_route_summary_sample\n",
+        "ORDER BY\n",
+        "  trip_count DESC"
+      ]
+    },
+    {
+      "name": "dow_trips",
+      "displayName": "Day of Week Trips",
+      "queryLines": [
+        "SELECT\n",
+        "  pickup_day_of_week,\n",
+        "  trip_count,\n",
+        "  avg_fare,\n",
+        "  avg_tip_pct,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_day_of_week_summary_sample\n",
+        "ORDER BY\n",
+        "  trip_count DESC"
+      ]
+    },
+    {
+      "name": "hourly_trips",
+      "displayName": "Hourly Trips",
+      "queryLines": [
+        "SELECT\n",
+        "  pickup_hour,\n",
+        "  trip_count,\n",
+        "  avg_fare,\n",
+        "  avg_distance,\n",
+        "  total_revenue,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_hourly_summary_sample\n",
+        "ORDER BY\n",
+        "  pickup_hour"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "889ac088",
+      "displayName": "Trip Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "total_trips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "sum(trip_count)",
+                      "expression": "SUM(`trip_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Trips"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(trip_count)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "total_revenue",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "sum(total_revenue)",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Revenue"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_revenue)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_fare",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "avg(avg_fare)",
+                      "expression": "AVG(`avg_fare`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Fare"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(avg_fare)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_distance",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "avg(avg_distance)",
+                      "expression": "AVG(`avg_distance`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Distance"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(avg_distance)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "hourly_trip_count",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "pickup_hour",
+                      "expression": "`pickup_hour`"
+                    },
+                    {
+                      "name": "sum(trip_count)",
+                      "expression": "SUM(`trip_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Hourly Trip Count"
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(trip_count)",
+                  "displayName": "trip_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "hourly_revenue",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_trips",
+                  "fields": [
+                    {
+                      "name": "pickup_hour",
+                      "expression": "`pickup_hour`"
+                    },
+                    {
+                      "name": "sum(total_revenue)",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Hourly Revenue"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(total_revenue)",
+                  "displayName": "total_revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "dow_trips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dow_trips",
+                  "fields": [
+                    {
+                      "name": "pickup_day_of_week",
+                      "expression": "`pickup_day_of_week`"
+                    },
+                    {
+                      "name": "sum(trip_count)",
+                      "expression": "SUM(`trip_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Trips by Day of Week"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(trip_count)",
+                  "displayName": "trip_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "dow_tip_pct",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dow_trips",
+                  "fields": [
+                    {
+                      "name": "pickup_day_of_week",
+                      "expression": "`pickup_day_of_week`"
+                    },
+                    {
+                      "name": "avg(avg_tip_pct)",
+                      "expression": "AVG(`avg_tip_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Tip % by Day of Week"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(avg_tip_pct)",
+                  "displayName": "avg_tip_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 8,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "top_routes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "top_routes",
+                  "fields": [
+                    {
+                      "name": "PULocationID",
+                      "expression": "`PULocationID`"
+                    },
+                    {
+                      "name": "DOLocationID",
+                      "expression": "`DOLocationID`"
+                    },
+                    {
+                      "name": "trip_count",
+                      "expression": "`trip_count`"
+                    },
+                    {
+                      "name": "year_month",
+                      "expression": "`year_month`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Routes"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "PULocationID"
+                  },
+                  {
+                    "fieldName": "DOLocationID"
+                  },
+                  {
+                    "fieldName": "trip_count"
+                  },
+                  {
+                    "fieldName": "year_month"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

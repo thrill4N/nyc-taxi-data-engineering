@@ -1,0 +1,909 @@
+{
+  "datasets": [
+    {
+      "name": "silver_quality_flags",
+      "displayName": "Silver Quality Flags",
+      "queryLines": [
+        "SELECT\n",
+        "  'Negative Fares' AS flag_name,\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN flag_negative_fare THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  ) AS count\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Neg/Zero Duration',\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN flag_negative_or_zero_duration THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  )\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Zero Passengers',\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN flag_zero_passenger THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  )\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Clean Rows',\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN\n",
+        "        NOT (\n",
+        "          flag_negative_fare\n",
+        "          OR flag_negative_or_zero_duration\n",
+        "          OR flag_zero_passenger\n",
+        "        )\n",
+        "      THEN\n",
+        "        1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  )\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "ORDER BY\n",
+        "  count DESC"
+      ]
+    },
+    {
+      "name": "silver_schema_validation",
+      "displayName": "Silver Schema Validation",
+      "queryLines": [
+        "SELECT\n",
+        "  year_month,\n",
+        "  report_json,\n",
+        "  validated_at\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_schema_validation_sample"
+      ]
+    },
+    {
+      "name": "bronze_quality_metrics",
+      "displayName": "Bronze Quality Metrics",
+      "queryLines": [
+        "SELECT\n",
+        "  year_month,\n",
+        "  report_json,\n",
+        "  recorded_at\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.bronze_quality_metrics_sample"
+      ]
+    },
+    {
+      "name": "cross_table_consistency",
+      "displayName": "Cross-Table Consistency",
+      "queryLines": [
+        "SELECT\n",
+        "  'Bronze (raw)' AS layer,\n",
+        "  COUNT(*) AS row_count\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.bronze_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Silver (cleaned)',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Gold - Hourly groups',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_hourly_summary_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Gold - Day-of-week groups',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_day_of_week_summary_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Gold - Top routes',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_route_summary_sample"
+      ]
+    },
+    {
+      "name": "pipeline_row_counts",
+      "displayName": "Pipeline Row Counts",
+      "queryLines": [
+        "SELECT\n",
+        "  'bronze_yellow_tripdata_sample' AS table_name,\n",
+        "  COUNT(*) AS row_count\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.bronze_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'silver_yellow_tripdata_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_yellow_tripdata_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'gold_hourly_summary_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_hourly_summary_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'gold_day_of_week_summary_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_day_of_week_summary_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'gold_route_summary_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_route_summary_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'bronze_quality_metrics_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.bronze_quality_metrics_sample\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'silver_schema_validation_sample',\n",
+        "  COUNT(*)\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.silver_schema_validation_sample\n",
+        "ORDER BY\n",
+        "  row_count DESC"
+      ]
+    },
+    {
+      "name": "dow_summary",
+      "displayName": "Day of Week Summary",
+      "queryLines": [
+        "SELECT\n",
+        "  pickup_day_of_week,\n",
+        "  trip_count,\n",
+        "  avg_fare,\n",
+        "  avg_tip_pct,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_day_of_week_summary_sample\n",
+        "ORDER BY\n",
+        "  trip_count DESC"
+      ]
+    },
+    {
+      "name": "hourly_summary",
+      "displayName": "Hourly Summary",
+      "queryLines": [
+        "SELECT\n",
+        "  pickup_hour,\n",
+        "  trip_count,\n",
+        "  avg_fare,\n",
+        "  avg_distance,\n",
+        "  total_revenue,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_hourly_summary_sample\n",
+        "ORDER BY\n",
+        "  pickup_hour"
+      ]
+    },
+    {
+      "name": "top_routes",
+      "displayName": "Top Routes",
+      "queryLines": [
+        "SELECT\n",
+        "  PULocationID,\n",
+        "  DOLocationID,\n",
+        "  trip_count,\n",
+        "  year_month\n",
+        "FROM\n",
+        "  nyc_taxi.pipeline.gold_route_summary_sample\n",
+        "ORDER BY\n",
+        "  trip_count DESC"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "a9da30d1",
+      "displayName": "Page 1",
+      "layout": [
+        {
+          "widget": {
+            "name": "pipeline_row_counts",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pipeline_row_counts",
+                  "fields": [
+                    {
+                      "name": "table_name",
+                      "expression": "`table_name`"
+                    },
+                    {
+                      "name": "row_count",
+                      "expression": "`row_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Pipeline Row Counts"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "table_name"
+                  },
+                  {
+                    "fieldName": "row_count"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "silver_quality_flags",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "silver_quality_flags",
+                  "fields": [
+                    {
+                      "name": "flag_name",
+                      "expression": "`flag_name`"
+                    },
+                    {
+                      "name": "sum(count)",
+                      "expression": "SUM(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Silver Data Quality Flags"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "flag_name",
+                  "displayName": "flag_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(count)",
+                  "displayName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "flag_name",
+                  "displayName": "flag_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "bronze_quality_metrics",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bronze_quality_metrics",
+                  "fields": [
+                    {
+                      "name": "year_month",
+                      "expression": "`year_month`"
+                    },
+                    {
+                      "name": "report_json",
+                      "expression": "`report_json`"
+                    },
+                    {
+                      "name": "recorded_at",
+                      "expression": "`recorded_at`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Bronze Quality Metrics"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "year_month"
+                  },
+                  {
+                    "fieldName": "report_json"
+                  },
+                  {
+                    "fieldName": "recorded_at"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "silver_schema_validation",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "silver_schema_validation",
+                  "fields": [
+                    {
+                      "name": "year_month",
+                      "expression": "`year_month`"
+                    },
+                    {
+                      "name": "report_json",
+                      "expression": "`report_json`"
+                    },
+                    {
+                      "name": "validated_at",
+                      "expression": "`validated_at`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Silver Schema Validation"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "year_month"
+                  },
+                  {
+                    "fieldName": "report_json"
+                  },
+                  {
+                    "fieldName": "validated_at"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 4,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "cross_table_consistency",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cross_table_consistency",
+                  "fields": [
+                    {
+                      "name": "layer",
+                      "expression": "`layer`"
+                    },
+                    {
+                      "name": "row_count",
+                      "expression": "`row_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Cross-Table Consistency"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "layer"
+                  },
+                  {
+                    "fieldName": "row_count"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 4
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "trip_analysis",
+      "displayName": "Trip Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "hourly_trip_patterns",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_summary",
+                  "fields": [
+                    {
+                      "name": "pickup_hour",
+                      "expression": "`pickup_hour`"
+                    },
+                    {
+                      "name": "sum(trip_count)",
+                      "expression": "SUM(`trip_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Hourly Trip Patterns"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(trip_count)",
+                  "displayName": "trip_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "revenue_by_hour",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_summary",
+                  "fields": [
+                    {
+                      "name": "pickup_hour",
+                      "expression": "`pickup_hour`"
+                    },
+                    {
+                      "name": "sum(total_revenue)",
+                      "expression": "SUM(`total_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Revenue by Hour"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(total_revenue)",
+                  "displayName": "total_revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "dow_trip_summary",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dow_summary",
+                  "fields": [
+                    {
+                      "name": "pickup_day_of_week",
+                      "expression": "`pickup_day_of_week`"
+                    },
+                    {
+                      "name": "sum(trip_count)",
+                      "expression": "SUM(`trip_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Day-of-Week Trip Summary"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(trip_count)",
+                  "displayName": "trip_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_tip_by_day",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dow_summary",
+                  "fields": [
+                    {
+                      "name": "pickup_day_of_week",
+                      "expression": "`pickup_day_of_week`"
+                    },
+                    {
+                      "name": "avg(avg_tip_pct)",
+                      "expression": "AVG(`avg_tip_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Average Tip Percentage by Day"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(avg_tip_pct)",
+                  "displayName": "avg_tip_pct",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_day_of_week",
+                  "displayName": "pickup_day_of_week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 4,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "top_routes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "top_routes",
+                  "fields": [
+                    {
+                      "name": "PULocationID",
+                      "expression": "`PULocationID`"
+                    },
+                    {
+                      "name": "DOLocationID",
+                      "expression": "`DOLocationID`"
+                    },
+                    {
+                      "name": "trip_count",
+                      "expression": "`trip_count`"
+                    },
+                    {
+                      "name": "year_month",
+                      "expression": "`year_month`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Routes"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "PULocationID"
+                  },
+                  {
+                    "fieldName": "DOLocationID"
+                  },
+                  {
+                    "fieldName": "trip_count"
+                  },
+                  {
+                    "fieldName": "year_month"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_fare_by_hour",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "hourly_summary",
+                  "fields": [
+                    {
+                      "name": "pickup_hour",
+                      "expression": "`pickup_hour`"
+                    },
+                    {
+                      "name": "avg(avg_fare)",
+                      "expression": "AVG(`avg_fare`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Average Fare by Hour"
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(avg_fare)",
+                  "displayName": "avg_fare",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "pickup_hour",
+                  "displayName": "pickup_hour",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 8,
+            "width": 6,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
