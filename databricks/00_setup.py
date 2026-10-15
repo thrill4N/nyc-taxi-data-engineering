@@ -60,8 +60,12 @@ def table_name(key):
 
 def write_month_partition(frame, destination):
     """Atomically replace one month so reruns are idempotent."""
-    if "year_month" not in frame.columns:
-        raise ValueError(f"{destination} must include a year_month column")
+    # No pre-validation of frame.columns here: on Spark Connect (Serverless /
+    # Standard) every .columns access inside a function sends an Analyze RPC
+    # to the server (SCPAP001).  Instead we let the write operations below
+    # surface the error naturally — partitionBy("year_month") and the
+    # replaceWhere predicate both raise a clear AnalysisException at action
+    # time if the column is absent, so an explicit guard is redundant.
 
     try:
         spark.sql(f"DESCRIBE TABLE {destination}")
